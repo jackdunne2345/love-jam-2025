@@ -1,0 +1,11 @@
+# Ignore VS Code configuration files
+.vscode/
+
+
+
+# Dependencies and build directories
+/build/
+/vendor/
+
+# Log files
+*.log 
