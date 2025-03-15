@@ -1,11 +1,16 @@
 require("features/npc/statsheets")
 require("features/npc/spritesheets")
 ---@class NPC
----@field statSheet StatSheets
 ---@field width number
 ---@field height number
 ---@field animations AnimationMap
 ---@field currentAniamtion Animation
+---@field power number
+---@field defense number
+---@field speed number
+---@field health number
+---@field special function
+---@field attackSpeed number
 NPC={}
 NPC.__index = NPC
 
@@ -15,7 +20,13 @@ NPC.__index = NPC
 ---@param animations AnimationMap
 function NPC.new(statSheet, width, height, animations)
    return setmetatable({
-    statSheet = statSheet,
+    power = statSheet.power,
+    defense = statSheet.defense,
+    speed = statSheet.speed,
+    health = statSheet.health,
+    special = statSheet.special,
+    attackSpeed = statSheet.attackSpeed,
+    ranged = statSheet.ranged,
     width = width,
     height = height,
     animations = animations,
@@ -28,10 +39,9 @@ function NPC:draw()
 end
 
 function NPC:update(dt)
-    
      self.animationTimer = self.animationTimer or 0
      self.animationTimer = self.animationTimer + dt
-     local animationInterval = 1 / (self.statSheet.speed * 5)
+     local animationInterval = 1 / (self.speed * 5)
      if self.animationTimer >= animationInterval then
          self.currentAniamtion:next()
          self.animationTimer = self.animationTimer - animationInterval

@@ -6,6 +6,7 @@
 ---@field health number
 ---@field special number
 ---@field attackSpeed number
+---@field ranged boolean
 StatSheets = {}
 StatSheets.__index = StatSheets
 

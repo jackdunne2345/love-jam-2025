@@ -6,7 +6,6 @@
 ---@param path string
 ---@return love.Image | nil
 local function loadSprite(path)
-  print("Loading sprite: " .. path)
     local success, image = pcall(love.graphics.newImage, path)
     if success then
         image:setFilter("nearest", "nearest")
@@ -32,7 +31,6 @@ SpriteSheet.__index = SpriteSheet
 ---@param frameHeight number
 ---@return SpriteSheet
 function SpriteSheet.new(imagePath,numberOfFrames,frameWidth,frameHeight)
-  print(imagePath,numberOfFrames,frameWidth,frameHeight)
   local self = {
     image = loadSprite(imagePath),
     numberOfFrames = numberOfFrames,
@@ -63,11 +61,13 @@ end
 ---@field spriteSheet SpriteSheet
 ---@field head Frame
 ---@field currentFrame Frame
+---@field image love.Image
+---@field clone function returns a new instance of the animation
 Animation={}
 Animation.__index = Animation
 ---@param SpriteSheet SpriteSheet
 ---@return Animation
-function Animation:new(SpriteSheet)
+function Animation.new(SpriteSheet)
   local sx,sy = SpriteSheet.image:getDimensions()
   local head = Frame.new(love.graphics.newQuad(0, 0, SpriteSheet.frameWidth,SpriteSheet.frameHeight, sx,sy))
   local current = head
@@ -80,12 +80,11 @@ function Animation:new(SpriteSheet)
       current = current.next
     end
   end
-  local self = {
+  return setmetatable({
     spriteSheet = SpriteSheet,
     head = head,
     currentFrame = head
-  }
-  return setmetatable(self,Animation)
+  },Animation)
 end
 
 function Animation:next()
@@ -96,7 +95,16 @@ function Animation:next()
   end
 end
 
-
+function Animation:clone()
+  local spriteSheet = self.spriteSheet
+  local head=self.head
+  local currentFrame=head
+  return setmetatable({
+    spriteSheet = spriteSheet,
+    head = head,
+    currentFrame = currentFrame
+  },Animation)
+end
 
 ---@class AnimationMap
 ---@field idle Animation
