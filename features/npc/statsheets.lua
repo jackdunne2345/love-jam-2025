@@ -9,7 +9,9 @@
 StatSheets = {}
 StatSheets.__index = StatSheets
 
----@param special function
+
+
+---@param special function param1: NPC
 ---@param power number
 ---@param defense number
 ---@param speed number

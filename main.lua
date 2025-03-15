@@ -1,14 +1,26 @@
 require("features/npc/npc")
 require("features/npc/statsheets")
 require("features/npc/spritesheets")
+--[[
+    1. right now the stat sheet is a single object that is shared between all npcs, this needs to be changed
+       along with the animation system. 
+          - stat sheet should intialise the npc class, the npc class should not reference the stat sheet
+          - Animation class needs a clone method to return a new instance of the animation without creating a new instance
+            of each frame in the list.
+    2. need to be able to add more npcs at runtime
+  ]]--
+
+
 --[[ 
 SUPER MEMEPORY LEAK?
 yes most likely
 ]]--
 
+
+
   StatSheetsManager = {
     SkeletonStats = StatSheets:new(
-        function()
+        function(npc)
           print("Special")
       end,
       10,
