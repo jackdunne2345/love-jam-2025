@@ -1,5 +1,11 @@
 
 ---@class StatSheets
+---@field power number
+---@field defense number
+---@field speed number
+---@field health number
+---@field special number
+---@field attackSpeed number
 StatSheets = {}
 StatSheets.__index = StatSheets
 
@@ -22,10 +28,7 @@ function StatSheets:new(special,power,defense,speed,health,attackSpeed,ranged)
     }, StatSheets)
 end
 
-SkeletonStats = StatSheets:new(
-    function()
-        print("Special")
-    end,
-    10,
-    5,
-    2,100,0.5,false)
+
+
+
+
