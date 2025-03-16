@@ -1,75 +1,70 @@
 require("features/npc/npc")
 require("features/npc/statsheets")
 require("features/npc/spritesheets")
+require("features/world/worldmanager")
 --[[
     1. right now the stat sheet is a single object that is shared between all npcs, this needs to be changed
        along with the animation system. 
           - stat sheet should intialise the npc class, the npc class should not reference the stat sheet (DONE)
           - Animation class needs a clone method to return a new instance of the animation without creating a new instance
             of each frame in the list.(DONE)
-    2. the npc needs a maximum widht and height field to contain all its animations.
+    2. the npc needs a maximum widht and height field to contain all its animations.(i just using a sprite sheet with uniform dimensions across all animations)FTM
     3. need to be able to add more npcs at runtime
+    4. npc will move using a vector (DONE)
+    5. need to handle multyple directions (DONE)
+    6. collision with the world and other npcs
+    7. need to have a system for drawing damgae quad for mele attacks
   ]]--
 
 
---[[ 
-SUPER MEMEPORY LEAK?
-yes most likely
-]]--
 
 
 
-  StatSheetsManager = {
-    SkeletonStats = StatSheets:new(
-        function(npc)
-          print("Special")
-      end,
-      10,
-      5,
-      2,100,0.5,false)
-  }
 
-SpriteSheetManager = {
-  SkeletonIdle=SpriteSheet.new("resources/sprites/skeleton/skeleton_idle.png",11,24,32),
-  SkeletonDeath=SpriteSheet.new("resources/sprites/skeleton/skeleton_dead.png",15,33,32),
-  SkeletonWalk=SpriteSheet.new("resources/sprites/skeleton/skeleton_walk.png",13,22,32),
-  SkeletonAttack=SpriteSheet.new("resources/sprites/skeleton/skeleton_attack.png",18,43,37),
-  SkeletonStunned=SpriteSheet.new("resources/sprites/skeleton/skeleton_stun.png",8,30,32),
-}
-SkeletonIdleAnimation = Animation.new(SpriteSheetManager.SkeletonIdle)
-SkeletonDeathAnimation = Animation.new(SpriteSheetManager.SkeletonDeath)
-SkeletonWalkAnimation = Animation.new(SpriteSheetManager.SkeletonWalk)
-SkeletonAttackAnimation = Animation.new(SpriteSheetManager.SkeletonAttack)
-SkeletonStunnedAnimation = Animation.new(SpriteSheetManager.SkeletonStunned)
-SkeletonMap = AnimationMap.new(SkeletonIdleAnimation:clone(),SkeletonAttackAnimation:clone(),SkeletonDeathAnimation:clone(),SkeletonWalkAnimation:clone(),SkeletonStunnedAnimation:clone())
 
-local skeleton
+local world,skeleton,enemySkeleton,bot,enemyBot
 function love.load()
-  skeleton = Skeleton.new()
+    -- skeleton = Skeleton.new(100, 100)
+    -- enemySkeleton = Skeleton.new(650, 260)
+    bot = ToastBot.new(100, 100)
+    enemyBot = ToastBot.new(650, 260)
+    world = WorldManager.new()
+    -- world:addFriendly(skeleton)
+    -- world:addEnemy(enemySkeleton)
+    world:addFriendly(bot)
+    world:addEnemy(enemyBot)
+    -- skeleton:setVector(Vector.new(1, 0))
+    -- enemySkeleton:setVector(Vector.new(-1, 0))
+    bot:setVector(Vector.new(1, 0))
+    enemyBot:setVector(Vector.new(-1, 0))
 end
 
 function love.update(dt)
-  skeleton:update(dt)
+    world:update(dt)
 end
 
 function love.draw()
-    skeleton:draw()
+    world:draw()
 end
-
 function love.keypressed(key)
   if key == "q" then
-    skeleton:idle()
+    bot:idle()
+    enemyBot:idle()
   end
   if key == "w" then
-    skeleton:attack()
+    bot:attack()
+    enemyBot:attack()
   end
   if key == "e" then
-    skeleton:death()
+    bot:death()
+    enemyBot:death()
   end
   if key == "r" then
-    skeleton:stunned()
+    bot:stunned()
+    enemyBot:stunned()
   end
   if key == "t" then
-    skeleton:walk()
+    bot:walk()
+    enemyBot:walk()
   end
 end

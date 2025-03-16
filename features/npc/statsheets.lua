@@ -6,6 +6,7 @@
 ---@field health number
 ---@field special number
 ---@field attackSpeed number
+---@field animationSpeed number
 ---@field ranged boolean
 StatSheets = {}
 StatSheets.__index = StatSheets
@@ -18,8 +19,9 @@ StatSheets.__index = StatSheets
 ---@param speed number
 ---@param health number
 ---@param attackSpeed number
+---@param animationSpeed number
 ---@param ranged boolean
-function StatSheets:new(special,power,defense,speed,health,attackSpeed,ranged)
+function StatSheets:new(special,power,defense,speed,health,attackSpeed,animationSpeed,ranged)
     return setmetatable({
         power = power,
         defense = defense,
@@ -27,6 +29,7 @@ function StatSheets:new(special,power,defense,speed,health,attackSpeed,ranged)
         health = health,
         special = special,
         attackSpeed = attackSpeed,
+        animationSpeed = animationSpeed,
         ranged = ranged or false
     }, StatSheets)
 end
