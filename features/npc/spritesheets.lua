@@ -66,13 +66,20 @@ end
 Animation={}
 Animation.__index = Animation
 ---@param SpriteSheet SpriteSheet
+---@param isVertical boolean | nil
 ---@return Animation
-function Animation.new(SpriteSheet)
+function Animation.new(SpriteSheet,isVertical)
+  isVertical = isVertical or false
   local sx,sy = SpriteSheet.image:getDimensions()
   local head = Frame.new(love.graphics.newQuad(0, 0, SpriteSheet.frameWidth,SpriteSheet.frameHeight, sx,sy))
   local current = head
   for i = 1, SpriteSheet.numberOfFrames - 1 do
-    local quad = love.graphics.newQuad(i*SpriteSheet.frameWidth, 0, SpriteSheet.frameWidth,SpriteSheet.frameHeight, sx,sy)
+    local quad
+    if isVertical then
+      quad = love.graphics.newQuad(0, i*SpriteSheet.frameHeight, SpriteSheet.frameWidth,SpriteSheet.frameHeight, sx,sy)
+    else
+      quad = love.graphics.newQuad(i*SpriteSheet.frameWidth, 0, SpriteSheet.frameWidth,SpriteSheet.frameHeight, sx,sy)
+    end
     current.next = Frame.new(quad)
     if i==SpriteSheet.numberOfFrames - 1 then
       current = head
@@ -86,12 +93,14 @@ function Animation.new(SpriteSheet)
     currentFrame = head
   },Animation)
 end
-
+---@return boolean
 function Animation:next()
   if self.currentFrame.next then
     self.currentFrame = self.currentFrame.next
+    return true
   else
     self.currentFrame = self.head
+    return false
   end
 end
 

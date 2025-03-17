@@ -22,7 +22,7 @@ require("features/world/worldmanager")
 
 
 
-local world,skeleton,enemySkeleton,bot,enemyBot
+local world,skeleton,enemySkeleton,bot,enemyBot,chainBot,enemyChainBot
 function love.load()
     -- skeleton = Skeleton.new(100, 100)
     -- enemySkeleton = Skeleton.new(650, 260)
@@ -35,8 +35,16 @@ function love.load()
     world:addEnemy(enemyBot)
     -- skeleton:setVector(Vector.new(1, 0))
     -- enemySkeleton:setVector(Vector.new(-1, 0))
-    bot:setVector(Vector.new(1, 0))
-    enemyBot:setVector(Vector.new(-1, 0))
+    bot:setVector(Vector.new(1, 10))
+    enemyBot:setVector(Vector.new(-1, -4))
+    chainBot = ChainBot.new(100, 100)
+    enemyChainBot = ChainBot.new(500, 100)
+
+    -- world:addFriendly(chainBot)
+    -- world:addEnemy(enemyChainBot)
+   
+    chainBot:setVector(Vector.new(1, 5))
+    enemyChainBot:setVector(Vector.new(-1, -4))
 end
 
 function love.update(dt)
@@ -48,23 +56,33 @@ function love.draw()
 end
 function love.keypressed(key)
   if key == "q" then
-    bot:idle()
-    enemyBot:idle()
+    -- bot:idle()
+    -- enemyBot:idle()
+    chainBot:idle()
+    enemyChainBot:idle()
   end
   if key == "w" then
-    bot:attack()
-    enemyBot:attack()
+    -- bot:attack()
+    -- enemyBot:attack()
+    -- chainBot:attack()
+    enemyChainBot:attack()
   end
   if key == "e" then
-    bot:death()
-    enemyBot:death()
+    -- bot:death()
+    -- enemyBot:death()
+    chainBot:death()
+    enemyChainBot:death()
   end
   if key == "r" then
-    bot:stunned()
-    enemyBot:stunned()
+    -- bot:stunned()
+    -- enemyBot:stunned()
+    chainBot:stunned()
+    enemyChainBot:stunned()
   end
   if key == "t" then
-    bot:walk()
-    enemyBot:walk()
+    -- bot:walk()
+    -- enemyBot:walk()
+    chainBot:walk()
+    enemyChainBot:walk()
   end
 end

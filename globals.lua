@@ -5,14 +5,21 @@ StatSheetsManager = {
       end,
       10,
       5,
-      20,100,0.5,2,false),
+      20,100,0.5,2,475,false),
       ToastBotStats = StatSheets:new(
         function(npc)
           print("Special")
       end,
       10,
       5,
-      20,100,0.5,2,false)
+      20,100,0.5,2,475,false),
+     ChainBotStats = StatSheets:new(
+        function(npc)
+          print("Special")
+      end,
+      10,
+      5,
+      20,100,0.5,2,500,false)
   }
 
 SpriteSheetManager = {
@@ -26,16 +33,27 @@ SpriteSheetManager = {
   botWalk=SpriteSheet.new("resources/sprites/toastbot/walk.png",8,106,22),
   botAttack=SpriteSheet.new("resources/sprites/toastbot/attack.png",11,106,22),
   botStunned=SpriteSheet.new("resources/sprites/toastbot/stun.png",2,106,22),
+  chainBotIdle=SpriteSheet.new("resources/sprites/chainbot/idle.png",5,126,39),
+  chainBotDeath=SpriteSheet.new("resources/sprites/chainbot/dead.png",5,126,39),
+  chainBotWalk=SpriteSheet.new("resources/sprites/chainbot/walk.png",8,126,39),
+  chainBotAttack=SpriteSheet.new("resources/sprites/chainbot/attack.png",8,126,39),
+  chainBotStunned=SpriteSheet.new("resources/sprites/chainbot/stun.png",2,126,39),
 }
-local skeletonIdleAnimation = Animation.new(SpriteSheetManager.SkeletonIdle)
-local skeletonDeathAnimation = Animation.new(SpriteSheetManager.SkeletonDeath)
-local skeletonWalkAnimation = Animation.new(SpriteSheetManager.SkeletonWalk)
-local skeletonAttackAnimation = Animation.new(SpriteSheetManager.SkeletonAttack)
-local skeletonStunnedAnimation = Animation.new(SpriteSheetManager.SkeletonStunned)
-SkeletonMap = AnimationMap.new(skeletonIdleAnimation:clone(),skeletonAttackAnimation:clone(),skeletonDeathAnimation:clone(),skeletonWalkAnimation:clone(),skeletonStunnedAnimation:clone())
-local botIdleAnimation = Animation.new(SpriteSheetManager.botIdle)
-local botDeathAnimation = Animation.new(SpriteSheetManager.botDeath)
-local botWalkAnimation = Animation.new(SpriteSheetManager.botWalk)
-local botAttackAnimation = Animation.new(SpriteSheetManager.botAttack)
-local botStunnedAnimation = Animation.new(SpriteSheetManager.botStunned)
-BotMap = AnimationMap.new(botIdleAnimation:clone(),botAttackAnimation:clone(),botDeathAnimation:clone(),botWalkAnimation:clone(),botStunnedAnimation:clone())
+SkeletonIdleAnimation = Animation.new(SpriteSheetManager.SkeletonIdle)
+SkeletonDeathAnimation = Animation.new(SpriteSheetManager.SkeletonDeath)
+SkeletonWalkAnimation = Animation.new(SpriteSheetManager.SkeletonWalk)
+SkeletonAttackAnimation = Animation.new(SpriteSheetManager.SkeletonAttack)
+SkeletonStunnedAnimation = Animation.new(SpriteSheetManager.SkeletonStunned)
+BotIdleAnimation = Animation.new(SpriteSheetManager.botIdle)
+BotDeathAnimation = Animation.new(SpriteSheetManager.botDeath)
+BotWalkAnimation = Animation.new(SpriteSheetManager.botWalk)
+BotStunnedAnimation = Animation.new(SpriteSheetManager.botStunned)
+BotAttackAnimation = Animation.new(SpriteSheetManager.botAttack)
+ChainBotIdleAnimation = Animation.new(SpriteSheetManager.chainBotIdle,true)
+ChainBotDeathAnimation = Animation.new(SpriteSheetManager.chainBotDeath,true)
+ChainBotWalkAnimation = Animation.new(SpriteSheetManager.chainBotWalk,true)
+ChainBotAttackAnimation = Animation.new(SpriteSheetManager.chainBotAttack,true)
+ChainBotStunnedAnimation = Animation.new(SpriteSheetManager.chainBotStunned,true)
+
+
+
