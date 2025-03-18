@@ -1,3 +1,7 @@
+
+require("core/utility")
+
+
 --need to create a circualr linekd list
 --each linekd list will be an anmiation loop
 --each node will be a frame
@@ -43,16 +47,20 @@ end
 
 ---@class Frame
 ---@field quad love.Quad
+---@field active boolean
 ---@field next Frame
 Frame = {}
 Frame.__index = Frame
 
 ---@param quad love.Quad
+---@param active boolean
 ---@return Frame
-function Frame.new(quad)
-  local self = {}
-  self.quad = quad
-  self.next = nil
+function Frame.new(quad,active)
+  local self = {
+    quad = quad,
+    active=active,
+    next = nil
+  }
   return setmetatable(self,Frame)
 end
 
@@ -67,20 +75,23 @@ Animation={}
 Animation.__index = Animation
 ---@param SpriteSheet SpriteSheet
 ---@param isVertical boolean | nil
+---@param activeFrames number[] | nil
 ---@return Animation
-function Animation.new(SpriteSheet,isVertical)
+function Animation.new(SpriteSheet,isVertical,activeFrames)
+  local nonNullActiveFrames = activeFrames or {}
   isVertical = isVertical or false
   local sx,sy = SpriteSheet.image:getDimensions()
-  local head = Frame.new(love.graphics.newQuad(0, 0, SpriteSheet.frameWidth,SpriteSheet.frameHeight, sx,sy))
+  local head = Frame.new(love.graphics.newQuad(0, 0, SpriteSheet.frameWidth,SpriteSheet.frameHeight, sx,sy),TableContains(nonNullActiveFrames,1,false) and true or false)
   local current = head
   for i = 1, SpriteSheet.numberOfFrames - 1 do
+    local active=TableContains(nonNullActiveFrames,i,false)
     local quad
     if isVertical then
       quad = love.graphics.newQuad(0, i*SpriteSheet.frameHeight, SpriteSheet.frameWidth,SpriteSheet.frameHeight, sx,sy)
     else
       quad = love.graphics.newQuad(i*SpriteSheet.frameWidth, 0, SpriteSheet.frameWidth,SpriteSheet.frameHeight, sx,sy)
     end
-    current.next = Frame.new(quad)
+    current.next = Frame.new(quad,active)
     if i==SpriteSheet.numberOfFrames - 1 then
       current = head
     else
@@ -93,14 +104,14 @@ function Animation.new(SpriteSheet,isVertical)
     currentFrame = head
   },Animation)
 end
----@return boolean
+---@return boolean,boolean
 function Animation:next()
   if self.currentFrame.next then
     self.currentFrame = self.currentFrame.next
-    return true
+    return true,self.currentFrame.active
   else
     self.currentFrame = self.head
-    return false
+    return false,self.currentFrame.active
   end
 end
 

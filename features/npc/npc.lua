@@ -20,6 +20,7 @@ require("globals")
 ---@field scale number
 ---@field hitboxPositionCenter boolean
 ---@field attackRange number
+---@field isActive boolean
 NPC={}
 NPC.__index = NPC
 
@@ -49,7 +50,8 @@ function NPC.new(statSheet, width, height, animations,initX,initY,hitboxPosition
     vector = nil,
     scale = 5,
     hitboxPositionCenter=hitboxPositionCenter == nil and true or hitboxPositionCenter,
-    attackRange=statSheet.attackRange
+    attackRange=statSheet.attackRange,
+    isActive=false
    }, NPC)
 end
 
@@ -89,6 +91,7 @@ function NPC:draw()
       hitBoxWidth = self.width*(self.scale>0 and self.scale or (self.scale*-1))
       hitBoxHeight = self.height*(self.scale>0 and self.scale or (self.scale*-1))
    end
+  
    love.graphics.print(self.x,self.x,self.y)
    love.graphics.rectangle(
       "line",
@@ -97,6 +100,10 @@ function NPC:draw()
       hitBoxWidth,
       hitBoxHeight
    )
+   if self.isActive and self.currentAnimation == self.animations.attack then
+      love.graphics.setColor(1, 0, 0, 1)
+      print("active")
+   end
    love.graphics.line(
       hitBoxX + hitBoxWidth/2,
       hitBoxY + hitBoxHeight/2,
@@ -108,16 +115,18 @@ function NPC:draw()
 end
 
 function NPC:update(dt)
-     self:move(dt)
+   --   self:move(dt)
      self.animationTimer = self.animationTimer or 0
      self.animationTimer = self.animationTimer + dt
      local animationInterval = 1 / (self.animationSpeed * 5)
      if self.animationTimer >= animationInterval then
-         if self.currentAnimation:next() then
+      local continue,active=self.currentAnimation:next()
+      self.isActive=active
+         if continue then
             self.animationTimer = self.animationTimer - animationInterval
          else
             self.animationTimer = 0
-            -- self.currentAnimation=self.animations.idle
+            self.currentAnimation=self.animations.idle
          end
      end
 end
