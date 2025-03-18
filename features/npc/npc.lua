@@ -115,14 +115,14 @@ function NPC:draw()
 end
 
 function NPC:update(dt)
-   --   self:move(dt)
+    local walk= self:move(dt)
      self.animationTimer = self.animationTimer or 0
      self.animationTimer = self.animationTimer + dt
      local animationInterval = 1 / (self.animationSpeed * 5)
-     if self.animationTimer >= animationInterval then
+     if self.animationTimer >= animationInterval  then
       local continue,active=self.currentAnimation:next()
       self.isActive=active
-         if continue then
+         if continue or walk then
             self.animationTimer = self.animationTimer - animationInterval
          else
             self.animationTimer = 0
@@ -182,6 +182,7 @@ function NPC:move(dt)
         local speedFactor = (self.speed) * dt
         self.x = self.x + self.vector.x * speedFactor
         self.y = self.y + self.vector.y * speedFactor
+        return true
     end
 end
 
