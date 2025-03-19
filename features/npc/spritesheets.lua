@@ -76,8 +76,9 @@ Animation.__index = Animation
 ---@param SpriteSheet SpriteSheet
 ---@param isVertical boolean | nil
 ---@param activeFrames number[] | nil
+---@param loop boolean 
 ---@return Animation
-function Animation.new(SpriteSheet,isVertical,activeFrames)
+function Animation.new(SpriteSheet,isVertical,activeFrames,loop)
   local nonNullActiveFrames = activeFrames or {}
   isVertical = isVertical or false
   local sx,sy = SpriteSheet.image:getDimensions()
@@ -93,6 +94,11 @@ function Animation.new(SpriteSheet,isVertical,activeFrames)
     end
     current.next = Frame.new(quad,active)
     if i==SpriteSheet.numberOfFrames - 1 then
+     
+      if loop then
+        current=current.next
+        current.next = head
+      end
       current = head
     else
       current = current.next
@@ -106,13 +112,17 @@ function Animation.new(SpriteSheet,isVertical,activeFrames)
 end
 ---@return boolean,boolean
 function Animation:next()
+
   if self.currentFrame.next then
     self.currentFrame = self.currentFrame.next
     return true,self.currentFrame.active
-  else
+  else if self.loop then
     self.currentFrame = self.head
     return false,self.currentFrame.active
+  else
+    return false,false
   end
+end
 end
 
 function Animation:clone()

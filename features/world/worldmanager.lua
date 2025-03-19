@@ -1,5 +1,5 @@
 
-
+require("core/utility")
 ---@class WorldManager
 ---@field friendly NPC[]
 ---@field enemy NPC[]   
@@ -24,6 +24,39 @@ function WorldManager:update(dt)
     end
 end
 
+function WorldManager:attack(npc)
+    local table=npc.friendly and  self.enemy or self.friendly
+
+    for _, enemy in ipairs(table) do
+        local x1,x2,y1,y2
+        x1=enemy.hitBoxX
+        x2=enemy.hitBoxX+enemy.hitBoxWidth
+        y1=enemy.hitBoxY
+        y2=enemy.hitBoxY+enemy.hitBoxHeight
+        local intersects=false
+        if LinesIntersect(npc.attackArea, LineSegment.new(x1,y1,x1,y2)) then
+            intersects=true
+           
+         else if LinesIntersect(npc.attackArea, LineSegment.new(x1,y2,x2,y2)) then
+            intersects=true
+        
+         else if LinesIntersect(npc.attackArea, LineSegment.new(x2,y2,x2,y1)) then
+            intersects=true
+          
+         else if LinesIntersect(npc.attackArea, LineSegment.new(x1,y1,x2,y1)) then
+            intersects=true
+       
+        end
+        end
+        end
+        end
+        if intersects then
+           
+            enemy:takeDamage(npc.power)
+        end
+    end
+end
+
 function WorldManager:draw()
     for _, npc in ipairs(self.friendly) do
         npc:draw()
@@ -34,10 +67,12 @@ function WorldManager:draw()
 end
 
 function WorldManager:addFriendly(npc)
+    npc.friendly = true
     table.insert(self.friendly, npc)
 end
 
 function WorldManager:addEnemy(npc)
+    npc.friendly = false
     table.insert(self.enemy, npc)
 end
 

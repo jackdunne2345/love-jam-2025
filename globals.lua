@@ -50,10 +50,10 @@ BotWalkAnimation = Animation.new(SpriteSheetManager.botWalk)
 BotStunnedAnimation = Animation.new(SpriteSheetManager.botStunned)
 BotAttackAnimation = Animation.new(SpriteSheetManager.botAttack)
 ChainBotIdleAnimation = Animation.new(SpriteSheetManager.chainBotIdle,true)
-ChainBotDeathAnimation = Animation.new(SpriteSheetManager.chainBotDeath,true)
-ChainBotWalkAnimation = Animation.new(SpriteSheetManager.chainBotWalk,true)
-ChainBotAttackAnimation = Animation.new(SpriteSheetManager.chainBotAttack,true,{1,5})
-ChainBotStunnedAnimation = Animation.new(SpriteSheetManager.chainBotStunned,true)
+ChainBotDeathAnimation = Animation.new(SpriteSheetManager.chainBotDeath,true,{},false)
+ChainBotWalkAnimation = Animation.new(SpriteSheetManager.chainBotWalk,true,{},true)
+ChainBotAttackAnimation = Animation.new(SpriteSheetManager.chainBotAttack,true,{1,5},false)
+ChainBotStunnedAnimation = Animation.new(SpriteSheetManager.chainBotStunned,true,{},false)
 
 
 

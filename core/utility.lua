@@ -1,3 +1,5 @@
+require("core/linesegment")
+
 --- Searches for a value in a table
 --- @param tbl table The table to search in
 --- @param value any The value to search for
@@ -82,4 +84,39 @@ function IndexOf(arr, value)
         end
     end
     return nil
+end
+
+--- Checks if two line segments intersect
+--- @param line1 LineSegment The first line segment
+--- @param line2 LineSegment The second line segment
+--- @return boolean
+function LinesIntersect(line1, line2)
+
+    -- Line 1 is represented as (x1,y1)->(x2,y2)
+    local x1, y1 = line1.x1, line1.y1
+    local x2, y2 = line1.x2, line1.y2
+    
+    -- Line 2 is represented as (x3,y3)->(x4,y4)
+    local x3, y3 = line2.x1, line2.y1
+    local x4, y4 = line2.x2, line2.y2
+    
+    -- Calculate denominators
+    local denominator = ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1))
+    
+    -- If denominator is 0, lines are parallel or collinear
+    if denominator == 0 then
+        return false
+    end
+    
+    -- Calculate ua and ub
+    local ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator
+    local ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator
+    
+    -- If ua and ub are between 0-1, segments intersect
+    if ua >= 0 and ua <= 1 and ub >= 0 and ub <= 1 then
+        return true
+    end
+    
+ 
+    return false
 end
