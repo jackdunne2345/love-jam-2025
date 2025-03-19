@@ -2,6 +2,7 @@ require("features/npc/statsheets")
 require("features/npc/spritesheets")
 require("core/vector")
 require("globals")
+require("core/linesegment")
 ---@class NPC
 ---@field width number
 ---@field height number
@@ -21,6 +22,11 @@ require("globals")
 ---@field hitboxPositionCenter boolean
 ---@field attackRange number
 ---@field isActive boolean
+---@field attackArea LineSegment | nil
+---@field hitBoxX number
+---@field hitBoxY number
+---@field hitBoxWidth number
+---@field hitBoxHeight number
 NPC={}
 NPC.__index = NPC
 
@@ -32,27 +38,38 @@ NPC.__index = NPC
 ---@param initY number|nil
 ---@param hitboxPositionCenter boolean | nil
 function NPC.new(statSheet, width, height, animations,initX,initY,hitboxPositionCenter)
-   return setmetatable({
-    power = statSheet.power,
-    defense = statSheet.defense,
-    speed = statSheet.speed,
-    health = statSheet.health,
-    special = statSheet.special,
-    attackSpeed = statSheet.attackSpeed,
-    ranged = statSheet.ranged,
-    width = width,
-    height = height,
-    animations = animations,
-    animationSpeed = statSheet.animationSpeed,
-    currentAnimation = animations.idle,
-    x = initX or 0,
-    y = initY or 0,
-    vector = nil,
-    scale = 5,
-    hitboxPositionCenter=hitboxPositionCenter == nil and true or hitboxPositionCenter,
-    attackRange=statSheet.attackRange,
-    isActive=false
-   }, NPC)
+   local self = {
+      power = statSheet.power,
+      defense = statSheet.defense,
+      speed = statSheet.speed,
+      health = statSheet.health,
+      special = statSheet.special,
+      attackSpeed = statSheet.attackSpeed,
+      ranged = statSheet.ranged,
+      width = width,
+      height = height,
+      animations = animations,
+      animationSpeed = statSheet.animationSpeed,
+      currentAnimation = animations.idle,
+      x = initX or 0,
+      y = initY or 0,
+      vector = nil,
+      scale = 5,
+      hitboxPositionCenter=hitboxPositionCenter == nil and true or hitboxPositionCenter,
+      attackRange=statSheet.attackRange,
+      isActive=false,
+      hitBoxX=0,
+      hitBoxY=0,
+      hitBoxWidth=0,
+      hitBoxHeight=0,
+   }
+   self.attackArea=LineSegment.new(
+      self.hitBoxX + self.hitBoxWidth/2,
+      self.hitBoxY + self.hitBoxHeight/2,
+      self.hitBoxX + self.hitBoxWidth/2 + self.attackRange*(self.scale>0 and 1 or -1),
+      self.hitBoxY + self.hitBoxHeight/2)
+      
+   return setmetatable(self, NPC)
 end
 
 --[[
@@ -78,44 +95,40 @@ function NPC:draw()
       self.currentAnimation.spriteSheet.frameHeight*(self.scale>0 and self.scale or (self.scale*-1))
    )
    love.graphics.setColor(0, 1, 0, 1)
-   local hitBoxX, hitBoxY, hitBoxWidth, hitBoxHeight
    
    if self.hitboxPositionCenter then
-      hitBoxX = self.x + ((self.animations.walk.spriteSheet.frameWidth+(self.scale<0 and self.width or (self.width*-1)))/2)*self.scale
-      hitBoxY = self.y + ((self.animations.walk.spriteSheet.frameHeight-self.height)/2)*self.scale*(self.scale>0 and 1 or -1)
-      hitBoxWidth = self.width*(self.scale>0 and self.scale or (self.scale*-1))
-      hitBoxHeight = self.height*(self.scale>0 and self.scale or (self.scale*-1))
+      self.hitBoxX = self.x + ((self.animations.walk.spriteSheet.frameWidth+(self.scale<0 and self.width or (self.width*-1)))/2)*self.scale
+      self.hitBoxY = self.y + ((self.animations.walk.spriteSheet.frameHeight-self.height)/2)*self.scale*(self.scale>0 and 1 or -1)
+      self.hitBoxWidth = self.width*(self.scale>0 and self.scale or (self.scale*-1))
+      self.hitBoxHeight = self.height*(self.scale>0 and self.scale or (self.scale*-1))
    else 
-      hitBoxX = self.x+(self.scale<0 and self.width*self.scale or 0)
-      hitBoxY = self.y
-      hitBoxWidth = self.width*(self.scale>0 and self.scale or (self.scale*-1))
-      hitBoxHeight = self.height*(self.scale>0 and self.scale or (self.scale*-1))
+      self.hitBoxX = self.x+(self.scale<0 and self.width*self.scale or 0)
+      self.hitBoxY = self.y
+      self.hitBoxWidth = self.width*(self.scale>0 and self.scale or (self.scale*-1))
+      self.hitBoxHeight = self.height*(self.scale>0 and self.scale or (self.scale*-1))
    end
   
    love.graphics.print(self.x,self.x,self.y)
    love.graphics.rectangle(
       "line",
-      hitBoxX,
-      hitBoxY,
-      hitBoxWidth,
-      hitBoxHeight
+      self.hitBoxX,
+      self.hitBoxY,
+      self.hitBoxWidth,
+      self.hitBoxHeight
    )
    if self.isActive and self.currentAnimation == self.animations.attack then
       love.graphics.setColor(1, 0, 0, 1)
-      print("active")
+
    end
    love.graphics.line(
-      hitBoxX + hitBoxWidth/2,
-      hitBoxY + hitBoxHeight/2,
-      hitBoxX + hitBoxWidth/2 + self.attackRange*(self.scale>0 and 1 or -1),
-      hitBoxY + hitBoxHeight/2
+  self.attackArea.x1,self.attackArea.y1,self.attackArea.x2,self.attackArea.y2
    )
    
    love.graphics.setColor(1, 1, 1, 1)
 end
 
 function NPC:update(dt)
-   --   self:move(dt)
+     self:move(dt)
      self.animationTimer = self.animationTimer or 0
      self.animationTimer = self.animationTimer + dt
      local animationInterval = 1 / (self.animationSpeed * 5)
@@ -126,30 +139,16 @@ function NPC:update(dt)
             self.animationTimer = self.animationTimer - animationInterval
          else
             self.animationTimer = 0
-            self.currentAnimation=self.animations.idle
+            self:setAnimation(self.animations.idle)
          end
      end
 end
 
-function NPC:attack()
-   self.animations.attack.currentFrame=self.animations.attack.head
-   self.currentAnimation = self.animations.attack
-end
-function NPC:death()
-   self.animations.death.currentFrame=self.animations.death.head
-   self.currentAnimation = self.animations.death
-end
-function NPC:stunned()
-   self.animations.stunned.currentFrame=self.animations.stunned.head
-   self.currentAnimation = self.animations.stunned
-end
-function NPC:walk()
-   self.animations.walk.currentFrame=self.animations.walk.head
-   self.currentAnimation = self.animations.walk
-end
-function NPC:idle()
-   self.animations.idle.currentFrame=self.animations.idle.head
-   self.currentAnimation = self.animations.idle
+
+---@param animation Animation
+function NPC:setAnimation(animation)
+   animation.currentFrame=animation.head
+   self.currentAnimation = animation
 end
 
 
@@ -167,21 +166,28 @@ function NPC:setVector(vector)
         if 1 * self.scale < 0 then  
             self.x = self.x + (self.currentAnimation.spriteSheet.frameWidth * self.scale*-1)-(self.width*self.scale*-1)
         end
-        
         self.currentAnimation = self.animations.walk
-  
+        self:attackAreaUpdate()
     --should do the hit box calculation here 
 end
 function NPC:clearVector()
    self.vector = nil
 end
-
+function NPC:attackAreaUpdate()
+   self.attackArea:update(
+      self.hitBoxX + self.hitBoxWidth/2,
+      self.hitBoxY + self.hitBoxHeight/2,
+      self.hitBoxX + self.hitBoxWidth/2 + self.attackRange*(self.scale>0 and 1 or -1),
+      self.hitBoxY + self.hitBoxHeight/2)
+end
 ---@param dt number Delta time
 function NPC:move(dt)
     if self.vector then
-        local speedFactor = (self.speed) * dt
-        self.x = self.x + self.vector.x * speedFactor
-        self.y = self.y + self.vector.y * speedFactor
+      --   local speedFactor = (self.speed) * dt
+      --   self.x = self.x + self.vector.x * speedFactor
+      --   self.y = self.y + self.vector.y * speedFactor
+
+        self:attackAreaUpdate()
     end
 end
 

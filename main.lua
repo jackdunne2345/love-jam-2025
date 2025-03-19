@@ -21,14 +21,15 @@ require("features/world/worldmanager")
 
 
 
-
-local world,skeleton,enemySkeleton,bot,enemyBot,chainBot,enemyChainBot
+World=nil
+local skeleton,enemySkeleton,bot,enemyBot,chainBot,enemyChainBot
 function love.load()
+    World = WorldManager.new()
     -- skeleton = Skeleton.new(100, 100)
     -- enemySkeleton = Skeleton.new(650, 260)
     bot = ToastBot.new(100, 100)
     enemyBot = ToastBot.new(650, 260)
-    world = WorldManager.new()
+    
     -- world:addFriendly(skeleton)
     -- world:addEnemy(enemySkeleton)
     -- world:addFriendly(bot)
@@ -40,19 +41,19 @@ function love.load()
     chainBot = ChainBot.new(100, 100)
     enemyChainBot = ChainBot.new(500, 100)
 
-    world:addFriendly(chainBot)
-    world:addEnemy(enemyChainBot)
+    World:addFriendly(chainBot)
+    World:addEnemy(enemyChainBot)
    
     chainBot:setVector(Vector.new(1, 5))
     enemyChainBot:setVector(Vector.new(-1, -4))
 end
 
 function love.update(dt)
-    world:update(dt)
+  World:update(dt)
 end
 
 function love.draw()
-    world:draw()
+  World:draw()
 end
 function love.keypressed(key)
   if key == "q" then
@@ -65,24 +66,24 @@ function love.keypressed(key)
     -- bot:attack()
     -- enemyBot:attack()
     -- chainBot:attack()
-    enemyChainBot:attack()
+    enemyChainBot:setAnimation(enemyChainBot.animations.attack)
   end
   if key == "e" then
     -- bot:death()
     -- enemyBot:death()
-    chainBot:death()
-    enemyChainBot:death()
+    chainBot:setAnimation(chainBot.animations.death)
+    enemyChainBot:setAnimation(enemyChainBot.animations.death)
   end
   if key == "r" then
     -- bot:stunned()
     -- enemyBot:stunned()
-    chainBot:stunned()
-    enemyChainBot:stunned()
+    chainBot:setAnimation(chainBot.animations.stunned)
+    enemyChainBot:setAnimation(enemyChainBot.animations.stunned)
   end
   if key == "t" then
     -- bot:walk()
     -- enemyBot:walk()
-    chainBot:walk()
-    enemyChainBot:walk()
+    chainBot:setAnimation(chainBot.animations.walk)
+    enemyChainBot:setAnimation(enemyChainBot.animations.walk)
   end
 end
