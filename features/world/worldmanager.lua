@@ -76,14 +76,13 @@ function WorldManager:addEnemy(npc)
     table.insert(self.enemy, npc)
 end
 
-function WorldManager:removeFriendly(npc)
-    for i, friendly in ipairs(self.friendly) do
-        if friendly == npc then
-            table.remove(self.friendly, i)
-            break
-        end
+function WorldManager:removeNPC(npc)
+    if npc.friendly then
+        table.remove(self.friendly, IndexOf(self.friendly, npc))
+    else
+        table.remove(self.enemy, IndexOf(self.enemy, npc))
     end
-end
+end 
 
 function WorldManager:clearEnemy()
     self.enemy = {}

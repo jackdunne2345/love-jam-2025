@@ -28,6 +28,7 @@ require("core/linesegment")
 ---@field hitBoxWidth number
 ---@field hitBoxHeight number
 ---@field friendly boolean|nil
+---@field dead boolean
 NPC={}
 NPC.__index = NPC
 
@@ -60,10 +61,11 @@ function NPC:draw()
    if self.isActive then
       love.graphics.setColor(1, 0, 0, 1)
    end
-   love.graphics.line(
-  self.attackArea.x1,self.attackArea.y1,self.attackArea.x2,self.attackArea.y2
-   )
-   
+   if self.attackArea then
+      love.graphics.line(
+         self.attackArea.x1,self.attackArea.y1,self.attackArea.x2,self.attackArea.y2
+      )
+   end
    love.graphics.setColor(1, 1, 1, 1)
 end
 
@@ -119,14 +121,18 @@ function NPC:takeDamage(damage)
  
    if self.health <= 0 then
       self.health=0
-      self:dead()
+      self:kill()
    end
 end
 
-function NPC:dead()
-  
-   self.isActive=false
+function NPC:kill()
+   if not self.dead then
    self:setAnimation(self.animations.death)
+   self.isActive=false
+   self.dead=true
+   self.attackArea=nil
+   self.vector=nil
+   end
 end
 
 ---@param vector Vector 
@@ -202,7 +208,8 @@ function NPC.new(statSheet, width, height, animations,initX,initY,hitboxPosition
       hitBoxY=0,
       hitBoxWidth=0,
       hitBoxHeight=0,
-      attackArea=nil
+      attackArea=nil,
+      dead=false
    }
    local metaTable=setmetatable(self, NPC)
    self:updateHitBox()

@@ -14,6 +14,7 @@ require("features/world/worldmanager")
     5. need to handle multyple directions (DONE)
     6. need to have a system for drawing damgae linesegment for mele attacks(done)
     7. handle the death of npcs, they should be rmeoved from world damage calculations
+    8. npcs need there own stat objec to keep track of there buffs and start of comabt stats
   ]]--
 
 
@@ -22,8 +23,11 @@ require("features/world/worldmanager")
 
 
 World=nil
+local gameWidth, gameHeight = 1920, 1080 
+local gameCanvas
 local skeleton,enemySkeleton,bot,enemyBot,chainBot,enemyChainBot
 function love.load()
+    gameCanvas = love.graphics.newCanvas(gameWidth, gameHeight)
     World = WorldManager.new()
     -- skeleton = Skeleton.new(100, 100)
     -- enemySkeleton = Skeleton.new(650, 260)
@@ -32,8 +36,8 @@ function love.load()
     
     -- world:addFriendly(skeleton)
     -- world:addEnemy(enemySkeleton)
-    -- World:addFriendly(bot)
-    -- World:addEnemy(enemyBot)
+    World:addFriendly(bot)
+    World:addEnemy(enemyBot)
     -- skeleton:setVector(Vector.new(1, 0))
     -- enemySkeleton:setVector(Vector.new(-1, 0))
     bot:setVector(Vector.new(1, 0))
@@ -53,7 +57,18 @@ function love.update(dt)
 end
 
 function love.draw()
+  love.graphics.setCanvas(gameCanvas)
+  love.graphics.clear()
   World:draw()
+  love.graphics.setCanvas()
+    local w, h = love.graphics.getDimensions()
+    
+    local scale = math.min(w/gameWidth, h/gameHeight)
+   
+    local x = (w - gameWidth * scale) / 2
+    local y = (h - gameHeight * scale) / 2
+    
+    love.graphics.draw(gameCanvas, x, y, 0, scale, scale)
 end
 function love.keypressed(key)
   if key == "q" then
