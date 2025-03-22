@@ -93,6 +93,10 @@ function Shop.init()
     return self
 end
 
+function Shop:sell(npc)
+    return npc.sellPrice
+end
+
 function Shop:draw()
     love.graphics.setColor(1,0,0,1)
     love.graphics.rectangle("line", GameWidth/10, GameHeight/40, GameWidth*.8, GameHeight/6)

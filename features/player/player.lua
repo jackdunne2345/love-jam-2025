@@ -120,6 +120,15 @@ function Player:mouseReleased(x, y, button)
     if button == 1 then
         local handItem = self.hand[self.lastClickedIndex]
         if handItem then
+
+            if x>=Shop.shopX and x<=Shop.shopX+Shop.shopWidth and
+            y>=Shop.shopY and y<=Shop.shopY+Shop.shopHeight then
+           
+                self.money=self.money+Shop:sell(handItem.npc)
+                table.remove(self.hand, self.lastClickedIndex)
+                self.lastClickedIndex = nil
+            
+            end
             handItem.showNPC = true
             self.lastClickedIndex = nil
         end

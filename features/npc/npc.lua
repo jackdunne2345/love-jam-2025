@@ -31,6 +31,7 @@ require("core/linesegment")
 ---@field dead boolean
 ---@field detectedEnemy boolean
 ---@field detectedEnemies NPC[]
+---@field sellPrice number
 NPC={}
 NPC.__index = NPC
 
@@ -191,6 +192,7 @@ end
 ---@param hitboxPositionCenter boolean | nil
 function NPC.new(statSheet, width, height, animations,initX,initY,hitboxPositionCenter)
    local self = {
+      sellPrice=1,
       power = statSheet.power,
       defense = statSheet.defense,
       speed = statSheet.speed,
