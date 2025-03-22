@@ -57,3 +57,4 @@ ChainBotStunnedAnimation = Animation.new(SpriteSheetManager.chainBotStunned,true
 
 
 
+NpcClasses = {ToastBot, Skeleton, ChainBot}

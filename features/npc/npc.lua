@@ -155,6 +155,7 @@ end
 
 function NPC:clearVector()
    self.vector = nil
+   self.currentAnimation = self.animations.idle
 end
 
 function NPC:attackAreaUpdate()

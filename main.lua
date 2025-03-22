@@ -2,6 +2,7 @@ require("features/npc/npc")
 require("features/npc/statsheets")
 require("features/npc/spritesheets")
 require("features/world/worldmanager")
+require("features/shop/shop")
 --[[
     1. right now the stat sheet is a single object that is shared between all npcs, this needs to be changed
        along with the animation system. 
@@ -23,53 +24,52 @@ require("features/world/worldmanager")
 
 
 World=nil
-local gameWidth, gameHeight = 1920, 1080 
-local gameCanvas
+
+GameWidth, GameHeight = 1920, 1080 
+MouseX, MouseY = 0,0
 local skeleton,enemySkeleton,bot,enemyBot,chainBot,enemyChainBot
 function love.load()
-    gameCanvas = love.graphics.newCanvas(gameWidth, gameHeight)
     World = WorldManager.new()
-    -- skeleton = Skeleton.new(100, 100)
-    -- enemySkeleton = Skeleton.new(650, 260)
-    bot = ToastBot.new(100, 100)
-    enemyBot = ToastBot.new(650, 260)
+    Shop = Shop.init()
+    love.window.setFullscreen(true, "desktop")
+    -- enemySkeleton = Skeleton.new(100, 100)
+    -- skeleton = Skeleton.new(650, 260)
+    -- enemyBot = ToastBot.new(100, 100)
+    -- bot = ToastBot.new(650, 260)
     
-    -- world:addFriendly(skeleton)
-    -- world:addEnemy(enemySkeleton)
-    World:addFriendly(bot)
-    World:addEnemy(enemyBot)
-    -- skeleton:setVector(Vector.new(1, 0))
-    -- enemySkeleton:setVector(Vector.new(-1, 0))
-    bot:setVector(Vector.new(1, 0))
-    enemyBot:setVector(Vector.new(-1, 0))
+    -- World:addFriendly(skeleton)
+    -- World:addEnemy(enemySkeleton)
+    -- World:addFriendly(bot)
+    -- World:addEnemy(enemyBot)
+    -- -- skeleton:setVector(Vector.new(-1, 0))
+    -- -- enemySkeleton:setVector(Vector.new(1, 0))
+    -- -- bot:setVector(Vector.new(1, 0))
+    -- -- enemyBot:setVector(Vector.new(-1, 0))
     chainBot = ChainBot.new(100, 100)
-    enemyChainBot = ChainBot.new(500, 100)
+    -- enemyChainBot = ChainBot.new(500, 100)
 
-    World:addFriendly(chainBot)
-    World:addEnemy(enemyChainBot)
+    -- World:addFriendly(chainBot)
+    -- World:addEnemy(enemyChainBot)
    
-    chainBot:setVector(Vector.new(1, 5))
-    enemyChainBot:setVector(Vector.new(-1, -4))
+    -- chainBot:setVector(Vector.new(1, 5))
+    -- enemyChainBot:setVector(Vector.new(-1, -4))
+    -- chainBot:clearVector()
 end
 
 function love.update(dt)
+  MouseX, MouseY = love.mouse.getPosition()
   World:update(dt)
+  Shop:update(dt)
 end
 
 function love.draw()
-  love.graphics.setCanvas(gameCanvas)
   love.graphics.clear()
   World:draw()
-  love.graphics.setCanvas()
-    local w, h = love.graphics.getDimensions()
-    
-    local scale = math.min(w/gameWidth, h/gameHeight)
-   
-    local x = (w - gameWidth * scale) / 2
-    local y = (h - gameHeight * scale) / 2
-    
-    love.graphics.draw(gameCanvas, x, y, 0, scale, scale)
+  Shop:draw()
 end
+
+
+
 function love.keypressed(key)
   if key == "q" then
     -- bot:idle()
@@ -101,4 +101,21 @@ function love.keypressed(key)
     chainBot:setAnimation(chainBot.animations.walk)
     enemyChainBot:setAnimation(enemyChainBot.animations.walk)
   end
+end
+
+function love.mousepressed(x, y, button)
+
+    local w, h = love.graphics.getDimensions()
+    local scale = math.min(w/GameWidth, h/GameHeight)
+    local xOffset = (w - GameWidth * scale) / 2
+    local yOffset = (h - GameHeight * scale) / 2
+    
+    local gameX = (x - xOffset) / scale
+    local gameY = (y - yOffset) / scale
+    
+   
+    Shop:mousepressed(gameX, gameY, button)
+end
+function love.mousereleased(x, y, button)
+      Shop:mousereleased(button)
 end
