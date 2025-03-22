@@ -214,7 +214,7 @@ function Shop:isPointInButton(x, y, button)
 end
 
 function Shop:roll()
- 
+ if 
     self.isRolling = true
 end
 
