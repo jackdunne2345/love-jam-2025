@@ -3,6 +3,7 @@ require("features/npc/statsheets")
 require("features/npc/spritesheets")
 require("features/world/worldmanager")
 require("features/shop/shop")
+require("features/player/player")
 --[[
     1. right now the stat sheet is a single object that is shared between all npcs, this needs to be changed
        along with the animation system. 
@@ -25,12 +26,13 @@ require("features/shop/shop")
 
 World=nil
 
-GameWidth, GameHeight = 1920, 1080 
+GameWidth, GameHeight = 1920, 1080
 MouseX, MouseY = 0,0
 local skeleton,enemySkeleton,bot,enemyBot,chainBot,enemyChainBot
 function love.load()
     World = WorldManager.new()
     Shop = Shop.init()
+    Player=Player.new()
     love.window.setFullscreen(true, "desktop")
     -- enemySkeleton = Skeleton.new(100, 100)
     -- skeleton = Skeleton.new(650, 260)
@@ -60,12 +62,16 @@ function love.update(dt)
   MouseX, MouseY = love.mouse.getPosition()
   World:update(dt)
   Shop:update(dt)
+  Player:update(dt)
+
 end
 
 function love.draw()
   love.graphics.clear()
-  World:draw()
+  World:draw() 
+  Player:draw()
   Shop:draw()
+ 
 end
 
 
@@ -114,8 +120,13 @@ function love.mousepressed(x, y, button)
     local gameY = (y - yOffset) / scale
     
    
-    Shop:mousepressed(gameX, gameY, button)
+    Shop:mousePressed(gameX, gameY, button)
+    if x >= Player.handX and x <= Player.handX + Player.handWidth and
+    y >= Player.handY and y <= Player.handY + Player.handHeight then
+      Player:mousePressed(gameX,gameY,button)
+    end
 end
 function love.mousereleased(x, y, button)
-      Shop:mousereleased(button)
+      Shop:mouseReleased(x,y,button)
+      Player:mouseReleased(x,y,button)
 end

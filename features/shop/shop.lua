@@ -34,7 +34,6 @@ end
 ---@field remainingWidth number
 ---@field boxHeight number
 ---@field isRolling boolean
----@field drawNewNpcs boolean
 ---@field buttons table Button data for interaction
 ---@field isMouseDown boolean Tracks if mouse was pressed inside a button
 Shop = {}
@@ -123,8 +122,14 @@ function Shop:draw()
                     0,
                     npc.scale
                 )
-            else
-                love.graphics.setColor(1, 0, 0, 1)
+            else 
+                if MouseX >= Player.handX and MouseX <= Player.handX + Player.handWidth and
+                MouseY >= Player.handY and MouseY <= Player.handY + Player.handHeight then
+                    love.graphics.setColor(0, 1, 0, 1)
+                else
+                    love.graphics.setColor(1, 0, 0, 1)
+                end
+                
                 love.graphics.draw(
                     npc.currentAnimation.spriteSheet.image,
                     npc.currentAnimation.currentFrame.quad,
@@ -148,9 +153,8 @@ function Shop:draw()
     else
         love.graphics.setColor(0, 0.8, 0, 1)
     end
-    love.graphics.rectangle("fill", self.buttons.freeze.x, self.buttons.freeze.y, 
+    love.graphics.rectangle("fill", self.buttons.freeze.x, self.buttons.freeze.y,
                             self.buttons.freeze.width, self.buttons.freeze.height)
-    
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.printf("Roll", self.buttons.roll.x, self.buttons.roll.y + self.buttons.roll.height / 2 - 10, 
                          self.buttons.roll.width, "center")
@@ -160,23 +164,29 @@ function Shop:draw()
 end
 
 function Shop:update(dt)
-    local npcCount=#self.offeredNPCS>#self.newShop and #self.offeredNPCS or #self.newShop
-    for i=1,  npcCount do
+    for i=1, #self.offeredNPCS>1 and #self.offeredNPCS or 2 do
         local shopItem = self.offeredNPCS[i]
        if shopItem ~= nil then
         local npc=shopItem.npc
         npc:update(dt)
             if self.isRolling then
+         
                 if npc.hitBoxY <= 600  then
+                  
                     npc.hitBoxY = npc.hitBoxY + 1500 * dt
                 else
+                 
                     self.isRolling = false
                     self.offeredNPCS = createNewShop()
-                    self.drawNewNpcs = false
                 end
             end
+        else if self.isRolling then
+        
+            self.isRolling = false
+            self.offeredNPCS = createNewShop()
         end
     end
+ end
     
     -- CHECK IF BUTTON WAS CLICKED
     for _, button in pairs(self.buttons) do
@@ -200,6 +210,7 @@ function Shop:isPointInButton(x, y, button)
 end
 
 function Shop:roll()
+ 
     self.isRolling = true
 end
 
@@ -210,7 +221,7 @@ end
 
 
 
-function Shop:mousepressed(x, y, button)
+function Shop:mousePressed(x, y, button)
     if button == 1 then  
         if self:isPointInButton(x, y, self.buttons.roll) then
             self.buttons.roll.clicked = true
@@ -231,7 +242,6 @@ function Shop:mousepressed(x, y, button)
                    y >= boxY and y <= boxY + self.boxHeight then
                     shopItem.showNPC = false
                     self.lastClickedIndex = i
-                
                     return
                 end
             end
@@ -239,12 +249,28 @@ function Shop:mousepressed(x, y, button)
     end
 end
 
-function Shop:mousereleased( button)
+function Shop:mouseReleased(x, y, button)
     if button == 1 and self.lastClickedIndex then 
         local shopItem = self.offeredNPCS[self.lastClickedIndex]
         if shopItem then
-            shopItem.showNPC = true
-
+            if x >= Player.handX and x <= Player.handX + Player.handWidth and
+               y >= Player.handY and y <= Player.handY + Player.handHeight then
+                if #Player.hand < Player.handLimit then
+                local  purchased = Player:addHandItem(shopItem.npc)
+                   if purchased then
+                    table.remove(self.offeredNPCS, self.lastClickedIndex)
+                    print("Added NPC to player hand! Hand size: " .. #Player.hand)
+                   
+                else
+                    shopItem.showNPC = true
+                end
+                else
+                    shopItem.showNPC = true
+                end
+            else
+                -- Mouse released outside player hand, just restore visibility
+                shopItem.showNPC = true
+            end
         end
         self.lastClickedIndex = nil -- Reset clicked index
     end
