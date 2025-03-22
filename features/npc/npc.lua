@@ -29,6 +29,8 @@ require("core/linesegment")
 ---@field hitBoxHeight number
 ---@field friendly boolean|nil
 ---@field dead boolean
+---@field detectedEnemy boolean
+---@field detectedEnemies NPC[]
 NPC={}
 NPC.__index = NPC
 
@@ -75,8 +77,11 @@ function NPC:update(dt)
      self.animationTimer = self.animationTimer + dt
      local animationInterval = 1 / (self.animationSpeed * 5)
      if self.animationTimer >= animationInterval  then
+      self.detectedEnemies=World:detectEnemies(self)
       local continue,active=self.currentAnimation:next()
-   
+      if #self.detectedEnemies>0 and self.currentAnimation ~= self.animations.attack then
+         self:setAnimation(self.animations.attack);
+      end
       self.isActive=active
          if continue then
             self.animationTimer = self.animationTimer - animationInterval
@@ -210,7 +215,8 @@ function NPC.new(statSheet, width, height, animations,initX,initY,hitboxPosition
       hitBoxWidth=0,
       hitBoxHeight=0,
       attackArea=nil,
-      dead=false
+      dead=false,
+      detectedEnemy=false
    }
    local metaTable=setmetatable(self, NPC)
    self:updateHitBox()
